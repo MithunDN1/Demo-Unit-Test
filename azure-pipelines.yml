@@ -26,3 +26,11 @@ steps:
 - script: |
     npm test -- -- watchAll=false || exit 1
   displayName: 'unit test'
+
+  # do this after your tests have run
+- script: dotnet test <test-project> --logger trx
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
