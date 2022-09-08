@@ -26,3 +26,31 @@ steps:
 - script: |
     npm test -- -- watchAll=false || exit 1
   displayName: 'unit test'
+
+- task: DownloadSecureFile@1
+  displayName: 'Download Settings'
+  inputs:
+    secureFile: 'settings_scrd.xml'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Agent.TempDirectory)'
+    Contents: 'settings_scrd.xml'
+    TargetFolder: '/home/vsts/.m2'
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    options: '-Xmx3072m'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    testRunTitle: 'Test'
+    codeCoverageToolOption: 'JaCoCo'
+    codeCoverageFailIfEmpty: true
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: true
+    #sonarQubeRunAnalysis: true
+    #sqMavenPluginVersionChoice: 'latest'
